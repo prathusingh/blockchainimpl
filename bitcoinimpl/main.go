@@ -4,7 +4,6 @@ import (
 	"time"
 	"fmt"
 	"crypto/sha256"
-	"encoding"
 )
 
 // Block structure
@@ -65,19 +64,52 @@ func NewBlockchain() *Blockchain {
 	}
 }
 
+// Adds a new block to the blockchain
 func (bc *Blockchain) AddBlock(data string) {
-	prev
+	prevBlock := bc.Chain[len(bc.Chain)-1]
+	newBlock := NewBlock(prevBlock,data)
+	bc.Chain = append(bc.Chain, newBlock)
+}
+
+// checks if the hash is valid based on difficulty (leading zeroes)
+func isValidHash(hash string, difficulty int) bool {
+	prefix := string(make([]byte, difficulty))
+	return hash[:difficulty] == prefix
+}
+
+// Tries different nonces to find a valid hash
+func ProofOfWork(b *Block, difficulty int) {
+	for {
+		hash := b.CalculateHash()
+		if isValidHash(hash, difficulty) {
+			break
+		}
+		b.Nonce++
+	}
 }
 
 
-
-
-
-
 func main() {
-	// Create the Genesis Block
-	genesisBlock := NewBlock([]string{"Genesis Block"}, "0")
-	fmt.Println(genesisBlock)
+	blockchain := NewBlockchain()
+
+	difficulty := 2 // difficulty level for Proof of Work
+
+	for i := 1; i <=3; i++ {
+		blockchain.AddBlock(fmt.Sprintf("Transaction %d", i))
+
+		// Get the last block
+		lastBlock := blockchain.Chain[len(blockchain.Chain)-1]
+
+		// Perform Proof Of Work on the new block
+		ProofOfWork(&lastBlock, difficulty)
+
+		fmt.Printf("Block #%d\n", lastBlock.Index)
+		fmt.Printf("Timestamp: %s\n", lastBlock.Timestamp)
+		fmt.Printf("Data: %s\n", lastBlock.Data)
+		fmt.Printf("PrevHash: %s\n", lastBlock.PrevHash)
+		fmt.Printf("Hash: %s\n", lastBlock.Hash)
+		fmt.Printf("Nonce: %d\n\n", lastBlock.Nonce)
+	}
 }
 
 
