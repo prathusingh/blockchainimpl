@@ -40,7 +40,7 @@ func NewBlock(prevBlock Block, data string) Block {
 		Nonce: 0,
 	}
 
-	block.Hash = ""
+	block.Hash = block.CalculateHash()
 	return block
 }
 
@@ -55,7 +55,6 @@ func CreateGenesisBlock() Block {
 	}
 }
 
-
 // Initiates the blockchain with the genesis block
 func NewBlockchain() *Blockchain {
 	genesisBlock := CreateGenesisBlock()
@@ -67,7 +66,7 @@ func NewBlockchain() *Blockchain {
 // Adds a new block to the blockchain
 func (bc *Blockchain) AddBlock(data string) {
 	prevBlock := bc.Chain[len(bc.Chain)-1]
-	newBlock := NewBlock(prevBlock,data)
+	newBlock := NewBlock(prevBlock, data)
 	bc.Chain = append(bc.Chain, newBlock)
 }
 
